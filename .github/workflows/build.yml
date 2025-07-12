@@ -35,8 +35,9 @@ jobs:
           cd ~/.local/var/pmbootstrap/cache_git/pmaports
           git remote
           git remote add pipa https://github.com/AroPix/pmaports-pipa.git
-          git fetch pipa master
-          git reset --hard pipa/master
+          git fetch pipa pipa
+          git branch -D master || true
+          git checkout -b master pipa/pipa
 
       - name: Build the xiaomi-pipa without DE
         run: |
