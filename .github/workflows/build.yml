@@ -2,8 +2,6 @@ name: Build pipa images
 on:
   push: # Build when push
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 5' # Start build every friday
 
 jobs:
   build-image:
@@ -37,9 +35,8 @@ jobs:
           cd ~/.local/var/pmbootstrap/cache_git/pmaports
           git remote
           git remote add pipa https://github.com/AroPix/pmaports-pipa.git
-          DEFAULT_BRANCH=$(git remote show pipa | awk '/HEAD branch/ {print $NF}')
-          git fetch pipa $DEFAULT_BRANCH
-          git reset --hard pipa/$DEFAULT_BRANCH
+          git fetch pipa master
+          git reset --hard pipa/master
 
       - name: Build the xiaomi-pipa without DE
         run: |
@@ -54,7 +51,7 @@ jobs:
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: nixxizlab
+          authorized-users: AroPix
       
       - name: Upload artifacts xiaomi-pipa without DE
         uses: actions/upload-artifact@v4
@@ -63,50 +60,27 @@ jobs:
            path: out/*.img*
            retention-days: 7
 
-      - name: Build the xiaomi-pipa with KDE Plasma Desktop
+      - name: Build the xiaomi-pipa with Sway
         run: |
            yes | pmbootstrap zap
            rm -r out/*
-           pmbootstrap install --password 147147 --add postmarketos-ui-plasma-desktop
+           pmbootstrap install --password 147147 --add postmarketos-ui-postmarketos-ui-sway
            cat /home/runner/.local/var/pmbootstrap/log.txt
            pmbootstrap export
            cp /tmp/postmarketOS-export/boot.img out/boot-xiaomi-pipa.img
-           cp /tmp/postmarketOS-export/xiaomi-pipa.img out/rootfs-xiaomi-pipa-plasma.img
+           cp /tmp/postmarketOS-export/xiaomi-pipa.img out/rootfs-xiaomi-pipa-sway.img
 
-      - name: Breakpoint if tests failed for xiaomi-pipa with KDE Plasma Desktop
+      - name: Breakpoint if tests failed for xiaomi-pipa with Sway
         if: failure()
         uses: namespacelabs/breakpoint-action@v0
         with:
           duration: 30m
-          authorized-users: nixxizlab
+          authorized-users: AroPix
       
-      - name: Upload artifacts xiaomi-pipa with KDE Plasma Desktop
+      - name: Upload artifacts xiaomi-pipa with Sway
         uses: actions/upload-artifact@v4
         with:
            name: xiaomi-pipa-plasma
-           path: out/*.img*
-           retention-days: 7
-            
-      - name: Build the xiaomi-pipa with GNOME
-        run: |
-           yes | pmbootstrap zap
-           rm -r out/*
-           pmbootstrap install --password 147147 --add postmarketos-ui-gnome
-           pmbootstrap export
-           cp /tmp/postmarketOS-export/boot.img out/boot-xiaomi-pipa.img
-           cp /tmp/postmarketOS-export/xiaomi-pipa.img out/rootfs-xiaomi-pipa-gnome.img
-
-      - name: Breakpoint if tests failed for xiaomi-pipa with GNOME
-        if: failure()
-        uses: namespacelabs/breakpoint-action@v0
-        with:
-          duration: 30m
-          authorized-users: nixxizlab
-            
-      - name: Upload artifacts xiaomi-pipa with GNOME
-        uses: actions/upload-artifact@v4
-        with:
-           name: xiaomi-pipa-gnome
            path: out/*.img*
            retention-days: 7
            
