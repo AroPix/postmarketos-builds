@@ -33,11 +33,12 @@ jobs:
         run: |
           echo -e '\n\n' | pmbootstrap init || true
           cd ~/.local/var/pmbootstrap/cache_git/pmaports
-          git remote
           git remote add pipa https://github.com/AroPix/pmaports-pipa.git
           git fetch pipa pipa
+          git checkout --detach
           git branch -D master || true
           git checkout -b master pipa/pipa
+
 
       - name: Build the xiaomi-pipa without DE
         run: |
